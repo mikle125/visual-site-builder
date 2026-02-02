@@ -19,9 +19,19 @@
 - Node.js 14 или выше
 - npm или yarn
 
+
 ### Установка
+
 
 1. Клонируйте репозиторий:
 ```bash
-git clone <repository-url>
+git clone https://github.com/mikle125/visual-site-builder.git
 cd visual-site-builder
+``` 
+
+
+### Запуск
+
+```bash
+npm start
+```
