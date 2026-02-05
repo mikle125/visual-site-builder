@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beta Site Builder</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- JSZip & FileSaver -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+    <div class="app">
+        <!-- Верхняя панель -->
+        <header class="top-bar">
+            <div class="project-name">
+                <input type="text" id="projectName" value="Мой проект" placeholder="Название проекта">
+            </div>
+            <div class="top-bar-controls">
+                <div class="toolbar">
+                    <button id="saveBtn" class="btn-primary" title="Сохранить проект">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                    <button id="loadBtn" class="btn-secondary" title="Загрузить проект">
+                        <i class="fas fa-folder-open"></i> Загрузить
+                    </button>
+                    <button id="exportBtn" class="btn-success" title="Экспортировать проект">
+                        <i class="fas fa-download"></i> Экспорт
+                    </button>
+                    <button id="undoBtn" class="btn-warning" title="Отменить (Ctrl+Z)">
+                        <i class="fas fa-undo"></i>
+                    </button>
+                    <button id="redoBtn" class="btn-warning" title="Повторить (Ctrl+Y)">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                    <button id="previewBtn" class="btn-primary" title="Предпросмотр">
+                        <i class="fas fa-eye"></i> Предпросмотр
+                    </button>
+                </div>
+                
+                <!-- Переключатель темы -->
+                <div class="theme-toggle" id="themeToggle" title="Переключить тему">
+                    <i class="bi bi-sun-fill"></i>
+                    <i class="bi bi-moon-fill"></i>
+                    <span class="theme-toggle-slider"></span>
+                    <input type="checkbox" id="themeSwitch">
+                </div>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <!-- Панель компонентов -->
+            <aside class="components-panel glass-panel">
+                <h3><i class="fas fa-shapes"></i> Компоненты</h3>
+                <div class="components-list">
+                    <div class="component" draggable="true" data-type="container">
+                        <i class="fas fa-square"></i> Контейнер
+                    </div>
+                    <div class="component" draggable="true" data-type="heading">
+                        <i class="fas fa-heading"></i> Заголовок
+                    </div>
+                    <div class="component" draggable="true" data-type="paragraph">
+                        <i class="fas fa-paragraph"></i> Текст
+                    </div>
+                    <div class="component" draggable="true" data-type="button">
+                        <i class="fas fa-square"></i> Кнопка
+                    </div>
+                    <div class="component" draggable="true" data-type="image">
+                        <i class="fas fa-image"></i> Изображение
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Рабочее поле (Canvas) -->
+            <main class="editor-area">
+                <div class="canvas-container glass-panel">
+                    <div class="canvas-toolbar">
+                        <div class="viewport-controls">
+                            <button class="viewport-btn active" data-viewport="desktop" title="Десктоп">
+                                <i class="fas fa-desktop"></i>
+                            </button>
+                            <button class="viewport-btn" data-viewport="tablet" title="Планшет">
+                                <i class="fas fa-tablet-alt"></i>
+                            </button>
+                            <button class="viewport-btn" data-viewport="mobile" title="Мобильный">
+                                <i class="fas fa-mobile-alt"></i>
+                            </button>
+                        </div>
+                        <button id="clearCanvas" class="btn-danger" title="Очистить холст">
+                            <i class="fas fa-trash"></i> Очистить холст
+                        </button>
+                    </div>
+                    <div class="canvas-wrapper">
+                        <div id="canvas" class="canvas">
+                            <div class="grid-overlay"></div>
+                            <!-- Элементы будут добавляться сюда -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Панель свойств -->
+            <aside class="properties-panel glass-panel">
+                <h3><i class="fas fa-sliders-h"></i> Свойства</h3>
+                <div id="propertiesForm" class="properties-form">
+                    <div class="property-group" id="elementInfo">
+                        <p>Выберите элемент для редактирования</p>
+                    </div>
+                    
+                    <div class="property-group">
+                        <h4><i class="fas fa-align-left"></i> Содержимое</h4>
+                        <div class="form-control">
+                            <label for="textContent">Текст</label>
+                            <textarea id="textContent" rows="3" placeholder="Текст элемента"></textarea>
+                        </div>
+                        <div class="form-control">
+                            <label for="imageUrl">URL изображения</label>
+                            <input type="text" id="imageUrl" placeholder="https://example.com/image.jpg">
+                        </div>
+                    </div>
+                    
+                    <div class="property-group">
+                        <h4><i class="fas fa-ruler-combined"></i> Размер и положение</h4>
+                        <div class="form-row">
+                            <div class="form-control">
+                                <label for="width">Ширина (px)</label>
+                                <input type="number" id="width" min="1" value="200">
+                            </div>
+                            <div class="form-control">
+                                <label for="height">Высота (px)</label>
+                                <input type="number" id="height" min="1" value="100">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-control">
+                                <label for="top">Сверху (px)</label>
+                                <input type="number" id="top" value="50">
+                            </div>
+                            <div class="form-control">
+                                <label for="left">Слева (px)</label>
+                                <input type="number" id="left" value="50">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="property-group">
+                        <h4><i class="fas fa-palette"></i> Внешний вид</h4>
+                        <div class="form-row">
+                            <div class="form-control">
+                                <label for="backgroundColor">Фон</label>
+                                <input type="color" id="backgroundColor" value="#ffffff">
+                            </div>
+                            <div class="form-control">
+                                <label for="color">Цвет текста</label>
+                                <input type="color" id="color" value="#000000">
+                            </div>
+                        </div>
+                        <div class="form-control">
+                            <label for="fontSize">Размер шрифта (px)</label>
+                            <input type="number" id="fontSize" min="8" max="100" value="16">
+                        </div>
+                        <div class="form-control">
+                            <label for="padding">Внутренний отступ (px)</label>
+                            <input type="number" id="padding" min="0" value="10">
+                        </div>
+                        <div class="form-control">
+                            <label for="borderRadius">Скругление (px)</label>
+                            <input type="number" id="borderRadius" min="0" value="0">
+                        </div>
+                    </div>
+                    
+                    <div class="property-group">
+                        <h4><i class="fas fa-cogs"></i> Действия</h4>
+                        <div class="form-row">
+                            <button id="deleteElement" class="btn-danger" style="flex: 1;">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                            <button id="duplicateElement" class="btn-secondary" style="flex: 1;">
+                                <i class="fas fa-copy"></i> Дублировать
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Модальное окно предпросмотра -->
+        <div id="previewModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Предпросмотр сайта</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <iframe id="sitePreview" frameborder="0"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button id="closePreview" class="btn-primary">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script type="module" src="state.js"></script>
+    <script type="module" src="editor.js"></script>
+    <script type="module" src="export.js"></script>
+    
+    <script>
+        // Theme toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeSwitch = document.getElementById('themeSwitch');
+            const html = document.documentElement;
+            
+            // Check saved theme or prefer-color-scheme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Apply theme
+            if (savedTheme === 'dark' || (savedTheme === 'system' && prefersDark)) {
+                html.setAttribute('data-theme', 'dark');
+                themeSwitch.checked = true;
+            }
+            
+            // Toggle theme
+            themeToggle.addEventListener('click', function() {
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                themeSwitch.checked = newTheme === 'dark';
+                
+                // Show notification
+                showNotification(`Тема изменена на ${newTheme === 'dark' ? 'темную' : 'светлую'}`);
+            });
+            
+            // Notification function
+            function showNotification(message, type = 'info') {
+                // Remove existing notification
+                const existingNotification = document.querySelector('.notification');
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+                
+                // Create new notification
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                notification.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Auto remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+            
+            // Add glass effect to all panels
+            document.querySelectorAll('.components-panel, .canvas-container, .properties-panel')
+                .forEach(panel => {
+                    panel.classList.add('glass-panel');
+                });
+            
+            // Add modern button classes
+            document.querySelectorAll('button').forEach(btn => {
+                btn.classList.add('btn-modern');
+            });
+        });
+    </script>
+</body>
+</html>

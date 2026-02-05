@@ -1,33 +1,16 @@
 {
-  "name": "visual-site-builder",
-  "version": "2.0.0",
-  "description": "Оптимизированный визуальный конструктор сайтов с русским интерфейсом",
-  "main": "server/src/server.js",
+  "name": "alfa_3",
+  "version": "1.0.0",
+  "main": "._editor.js",
   "scripts": {
-    "start": "node server/src/server.js",
-    "dev": "cd server && nodemon src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
-  "keywords": [
-    "visual",
-    "site",
-    "builder",
-    "editor",
-    "html",
-    "css",
-    "javascript"
-  ],
-  "author": "Visual Site Builder Team",
-  "license": "MIT",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "better-sqlite3": "^8.4.0",
-    "fs-extra": "^11.1.1",
-    "archiver": "^6.0.1",
-    "uuid": "^9.0.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
+    "express": "^5.2.1"
   }
 }
