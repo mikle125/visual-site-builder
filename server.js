@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware для обработки JSON
 app.use(express.json());
@@ -106,7 +106,6 @@ app.post('/api/export', (req, res) => {
 });
 
 // Запуск сервера
-app.listen(port, () => {
-    console.log(`Сервер запущен на http://localhost:${port}`);
-    console.log(`Редактор доступен по адресу: http://localhost:${port}/index.html`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log('Server running on port', PORT);
 });
